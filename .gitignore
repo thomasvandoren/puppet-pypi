@@ -1,0 +1,7 @@
+# Emacs stuff.
+*~
+*#*#
+*.#*
+
+# puppet-module build artifacts
+/pkg
