@@ -1,6 +1,8 @@
 pypi module for puppet
 ======================
 
+0.0.3
+-----
 Fix another htaccess issue.
 
 0.0.2
