@@ -31,7 +31,7 @@ describe 'pypi', :type => 'class' do
       should contain_exec('create-htaccess').with(:user    => 'pypi',
                                                   :group   => 'pypi',
                                                   :creates => '/var/pypi/.htaccess')
-      should contain_exec('create-htaccess').with_command(/\/usr\/bin\/htpasswd -sc \/var\/pypi\/\.htaccess/)
+      should contain_exec('create-htaccess').with_command(/\/usr\/bin\/htpasswd -sbc \/var\/pypi\/\.htaccess pypiadmin/)
       should contain_exec('create-htaccess').with_command(/1234$/)
 
       should contain_apache

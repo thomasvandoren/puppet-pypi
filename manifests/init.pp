@@ -62,11 +62,12 @@ class pypi (
   }
 
   exec { 'create-htaccess':
-    command => "/usr/bin/htpasswd -sc /var/pypi/.htaccess ${pypi_http_password}",
+    command => "/usr/bin/htpasswd -sbc /var/pypi/.htaccess pypiadmin ${pypi_http_password}",
     user    => 'pypi',
     group   => 'pypi',
     creates => '/var/pypi/.htaccess',
     require => Package['httpd'],
+    notify  => Service['httpd'],
   }
 
   include apache
