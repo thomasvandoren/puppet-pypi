@@ -6,9 +6,24 @@
 #
 # puppetlabs-apache
 #
+# === Parameters
+#
+# [*pypi_http_password*]
+#   Set the password for uploads.
+#   Default: '1234'
+#
+# [*pypi_port*]
+#   Port for apache to listen on.
+#   Default: 80
+#
 # === Examples
 #
 #   include pypi
+#
+#   class { 'pypi':
+#     pypi_http_password => hiera('my_secret_pypi_key'),
+#     pypi_port          => '8080',
+#   }
 #
 # === Authors
 #
@@ -19,6 +34,7 @@
 # Copyright 2012 Cozi Group, Inc., unless otherwise noted
 #
 class pypi (
+  $pypi_http_password = '1234',
   $pypi_port = '80',
   ) {
   group { 'pypi':
@@ -44,14 +60,13 @@ class pypi (
     source => 'puppet:///modules/pypi/pypiserver_wsgi.py',
     notify => Service['httpd'],
   }
-  file { '.htaccess':
-    ensure => present,
-    path   => '/var/pypi/.htaccess',
-    owner  => 'pypi',
-    group  => 'pypi',
-    mode   => '0755',
-    source => 'puppet:///modules/pypi/.htaccess',
-    notify => Service['httpd'],
+
+  exec { 'create-htaccess':
+    command => "/usr/bin/htpasswd -sc /var/pypi/.htaccess ${pypi_http_password}",
+    user    => 'pypi',
+    group   => 'pypi',
+    creates => '/var/pypi/.htaccess',
+    require => Package['httpd'],
   }
 
   include apache
