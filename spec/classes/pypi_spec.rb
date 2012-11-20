@@ -27,12 +27,12 @@ describe 'pypi', :type => 'class' do
                                                      :group  => 'pypi',
                                                      :mode   => '0755',
                                                      :source => 'puppet:///modules/pypi/pypiserver_wsgi.py')
-      should contain_file('.htaccess').with(:ensure => 'present',
-                                            :path   => '/var/pypi/.htaccess',
-                                            :owner  => 'pypi',
-                                            :group  => 'pypi',
-                                            :mode   => '0755',
-                                            :source => 'puppet:///modules/pypi/.htaccess')
+
+      should contain_exec('create-htaccess').with(:user    => 'pypi',
+                                                  :group   => 'pypi',
+                                                  :creates => '/var/pypi/.htaccess')
+      should contain_exec('create-htaccess').with_command(/\/usr\/bin\/htpasswd -sc \/var\/pypi\/\.htaccess/)
+      should contain_exec('create-htaccess').with_command(/1234$/)
 
       should contain_apache
       should contain_apache__mod__wsgi
@@ -48,6 +48,27 @@ describe 'pypi', :type => 'class' do
                                              :provider => 'pip')
       should contain_package('pypiserver').with(:ensure   => 'present',
                                                 :provider => 'pip')
+    end # it
+  end # context
+
+  context "On Debian system with non-default params" do
+
+    let :facts do
+      {
+        :osfamily => 'Debian'
+      }
+    end # let
+
+    let :params do
+      {
+        :pypi_http_password => 'TopSecret',
+        :pypi_port          => '42'
+      }
+    end # let
+
+    it do
+      should contain_exec('create-htaccess').with_command(/TopSecret$/)
+      should contain_apache__vhost('pypi').with_port('42')
     end # it
   end # context
 end # describe
