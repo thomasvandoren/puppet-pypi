@@ -13,8 +13,12 @@ describe 'pypi', :type => 'class' do
     it do
       should contain_group('pypi').with_ensure('present')
       should contain_user('pypi').with(:ensure  => 'present',
-                                       :gid     => 'pypi')
+                                       :gid     => 'pypi',
+                                       :home    => '/home/pypi')
 
+      should contain_file('/home/pypi').with(:ensure => 'directory',
+                                             :owner  => 'pypi',
+                                             :group  => 'pypi')
       should contain_file('/var/pypi').with(:ensure => 'directory',
                                             :owner  => 'pypi',
                                             :group  => 'pypi')

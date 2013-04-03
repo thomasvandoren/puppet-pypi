@@ -43,10 +43,11 @@ class pypi (
   user { 'pypi':
     ensure  => present,
     gid     => 'pypi',
+    home    => '/home/pypi',
     require => Group['pypi'],
   }
 
-  file { ['/var/pypi', '/var/pypi/packages']:
+  file { [ '/home/pypi', '/var/pypi', '/var/pypi/packages' ]:
     ensure => directory,
     owner  => 'pypi',
     group  => 'pypi',
