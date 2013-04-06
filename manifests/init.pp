@@ -16,6 +16,10 @@
 #   Port for apache to listen on.
 #   Default: 80
 #
+# [*pypi_root*]
+#   Directory to install pypi and keep packages.
+#   Default: /var/pypi
+#
 # === Examples
 #
 #   include pypi
@@ -23,6 +27,7 @@
 #   class { 'pypi':
 #     pypi_http_password => hiera('my_secret_pypi_key'),
 #     pypi_port          => '8080',
+#     pypi_root          => '/srv/pypi',
 #   }
 #
 # === Authors
@@ -36,6 +41,7 @@
 class pypi (
   $pypi_http_password = '1234',
   $pypi_port = '80',
+  $pypi_root = '/var/pypi',
   ) {
   group { 'pypi':
     ensure => present,
@@ -47,26 +53,26 @@ class pypi (
     require => Group['pypi'],
   }
 
-  file { [ '/home/pypi', '/var/pypi', '/var/pypi/packages' ]:
+  file { [ '/home/pypi', $pypi_root, "${pypi_root}/packages" ]:
     ensure => directory,
     owner  => 'pypi',
     group  => 'pypi',
   }
   file { 'pypiserver_wsgi.py':
-    ensure => present,
-    path   => '/var/pypi/pypiserver_wsgi.py',
-    owner  => 'pypi',
-    group  => 'pypi',
-    mode   => '0755',
-    source => 'puppet:///modules/pypi/pypiserver_wsgi.py',
-    notify => Service['httpd'],
+    ensure  => present,
+    path    => "${pypi_root}/pypiserver_wsgi.py",
+    owner   => 'pypi',
+    group   => 'pypi',
+    mode    => '0755',
+    content => template('pypi/pypiserver_wsgi.py'),
+    notify  => Service['httpd'],
   }
 
   exec { 'create-htaccess':
-    command => "/usr/bin/htpasswd -sbc /var/pypi/.htaccess pypiadmin ${pypi_http_password}",
+    command => "/usr/bin/htpasswd -sbc ${pypi_root}/.htaccess pypiadmin ${pypi_http_password}",
     user    => 'pypi',
     group   => 'pypi',
-    creates => '/var/pypi/.htaccess',
+    creates => "${pypi_root}/.htaccess",
     require => Package['httpd'],
     notify  => Service['httpd'],
   }
@@ -76,7 +82,7 @@ class pypi (
   apache::vhost { 'pypi':
     priority      => '10',
     port          => $pypi_port,
-    docroot       => '/var/pypi',
+    docroot       => $pypi_root,
     docroot_owner => 'pypi',
     docroot_group => 'pypi',
     template      => 'pypi/vhost-pypi.conf.erb',
