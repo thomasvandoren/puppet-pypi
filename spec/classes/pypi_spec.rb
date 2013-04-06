@@ -29,8 +29,8 @@ describe 'pypi', :type => 'class' do
                                                      :path   => '/var/pypi/pypiserver_wsgi.py',
                                                      :owner  => 'pypi',
                                                      :group  => 'pypi',
-                                                     :mode   => '0755',
-                                                     :source => 'puppet:///modules/pypi/pypiserver_wsgi.py')
+                                                     :mode   => '0755')
+      should contain_file('pypiserver_wsgi.py').with_content(/pypiserver\.app\('\/var\/pypi\/packages.*\/var\/pypi\/\.htaccess/)
 
       should contain_exec('create-htaccess').with(:user    => 'pypi',
                                                   :group   => 'pypi',
@@ -66,13 +66,18 @@ describe 'pypi', :type => 'class' do
     let :params do
       {
         :pypi_http_password => 'TopSecret',
-        :pypi_port          => '42'
+        :pypi_port          => '42',
+        :pypi_root          => '/srv/somewhere'
       }
     end # let
 
     it do
       should contain_exec('create-htaccess').with_command(/TopSecret$/)
       should contain_apache__vhost('pypi').with_port('42')
+      should contain_file('pypiserver_wsgi.py').with_content(/pypiserver\.app\('\/srv\/somewhere\/packages.*\/srv\/somewhere\/\.htaccess/)
+      should contain_exec('create-htaccess').with_command(/\/usr\/bin\/htpasswd -sbc \/srv\/somewhere\/\.htaccess pypiadmin/)
+      should contain_exec('create-htaccess').with_creates('/srv/somewhere/.htaccess')
+      should contain_apache__vhost('pypi').with_docroot('/srv/somewhere')
     end # it
   end # context
 end # describe
