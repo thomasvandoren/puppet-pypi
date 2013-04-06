@@ -24,7 +24,7 @@ Alias /robots.txt /srv/yoursite/htdocs/robots.txt
   </Directory>
 
   WSGIPassAuthorization On
-  WSGIScriptAlias /     /var/pypi/pypiserver_wsgi.py
+  WSGIScriptAlias /     <%= docroot %>/pypiserver_wsgi.py
   WSGIDaemonProcess     pypi user=pypi group=pypi processes=1 threads=5 maximum-requests=500 umask=0007 display-name=wsgi-pypi inactivity-timeout=300
   WSGIProcessGroup      pypi
 
