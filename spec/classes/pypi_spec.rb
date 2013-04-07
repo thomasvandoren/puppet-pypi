@@ -32,11 +32,10 @@ describe 'pypi', :type => 'class' do
                                                      :mode   => '0755')
       should contain_file('pypiserver_wsgi.py').with_content(/pypiserver\.app\('\/var\/pypi\/packages.*\/var\/pypi\/\.htaccess/)
 
-      should contain_exec('create-htaccess').with(:user    => 'pypi',
-                                                  :group   => 'pypi',
-                                                  :creates => '/var/pypi/.htaccess')
-      should contain_exec('create-htaccess').with_command(/\/usr\/bin\/htpasswd -sbc \/var\/pypi\/\.htaccess pypiadmin/)
-      should contain_exec('create-htaccess').with_command(/1234$/)
+      should contain_httpauth('pypiadmin').with(:ensure    => 'present',
+                                                :file      => '/var/pypi/.htaccess',
+                                                :password  => '1234',
+                                                :mechanism => 'basic')
 
       should contain_apache
       should contain_apache__mod__wsgi
@@ -72,11 +71,10 @@ describe 'pypi', :type => 'class' do
     end # let
 
     it do
-      should contain_exec('create-htaccess').with_command(/TopSecret$/)
       should contain_apache__vhost('pypi').with_port('42')
       should contain_file('pypiserver_wsgi.py').with_content(/pypiserver\.app\('\/srv\/somewhere\/packages.*\/srv\/somewhere\/\.htaccess/)
-      should contain_exec('create-htaccess').with_command(/\/usr\/bin\/htpasswd -sbc \/srv\/somewhere\/\.htaccess pypiadmin/)
-      should contain_exec('create-htaccess').with_creates('/srv/somewhere/.htaccess')
+      should contain_httpauth('pypiadmin').with(:file     => '/srv/somewhere/.htaccess',
+                                                :password => 'TopSecret')
       should contain_apache__vhost('pypi').with_docroot('/srv/somewhere')
     end # it
   end # context

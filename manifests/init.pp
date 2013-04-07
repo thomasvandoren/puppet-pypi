@@ -68,13 +68,13 @@ class pypi (
     notify  => Service['httpd'],
   }
 
-  exec { 'create-htaccess':
-    command => "/usr/bin/htpasswd -sbc ${pypi_root}/.htaccess pypiadmin ${pypi_http_password}",
-    user    => 'pypi',
-    group   => 'pypi',
-    creates => "${pypi_root}/.htaccess",
-    require => Package['httpd'],
-    notify  => Service['httpd'],
+  httpauth { 'pypiadmin':
+    ensure    => present,
+    file      => "${pypi_root}/.htaccess",
+    password  => $pypi_http_password,
+    mechanism => 'basic',
+    require   => Package['httpd'],
+    notify    => Service['httpd'],
   }
 
   include apache
