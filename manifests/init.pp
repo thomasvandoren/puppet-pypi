@@ -72,7 +72,7 @@ class pypi (
     path   => "${pypi_root}/.htaccess",
     owner  => 'pypi',
     group  => 'pypi',
-    mode   => '0600',
+    mode   => '0644',
     notify => Httpauth['pypiadmin'],
   }
 
@@ -83,15 +83,6 @@ class pypi (
     mechanism => 'basic',
     require   => [ Package['httpd'], File['.htaccess'] ],
     notify    => Service['httpd'],
-  }
-
-  file { '.htaccess-ensure-perms':
-    ensure  => present,
-    path    => "${pypi_root}/.htaccess",
-    owner   => 'pypi',
-    group   => 'pypi',
-    mode    => '0600',
-    require => Httpauth['pypiadmin'],
   }
 
   include apache

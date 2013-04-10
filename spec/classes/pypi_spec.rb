@@ -35,12 +35,7 @@ describe 'pypi', :type => 'class' do
                                             :path   => '/var/pypi/.htaccess',
                                             :owner  => 'pypi',
                                             :group  => 'pypi',
-                                            :mode   => '0600')
-      should contain_file('.htaccess-ensure-perms').with(:ensure => 'present',
-                                                         :path   => '/var/pypi/.htaccess',
-                                                         :owner  => 'pypi',
-                                                         :group  => 'pypi',
-                                                         :mode   => '0600')
+                                            :mode   => '0644')
 
       should contain_httpauth('pypiadmin').with(:ensure    => 'present',
                                                 :file      => '/var/pypi/.htaccess',
@@ -84,7 +79,6 @@ describe 'pypi', :type => 'class' do
       should contain_apache__vhost('pypi').with_port('42')
       should contain_file('pypiserver_wsgi.py').with_content(/pypiserver\.app\('\/srv\/somewhere\/packages.*\/srv\/somewhere\/\.htaccess/)
       should contain_file('.htaccess').with_path('/srv/somewhere/.htaccess')
-      should contain_file('.htaccess-ensure-perms').with_path('/srv/somewhere/.htaccess')
       should contain_httpauth('pypiadmin').with(:file     => '/srv/somewhere/.htaccess',
                                                 :password => 'TopSecret')
       should contain_apache__vhost('pypi').with_docroot('/srv/somewhere')
