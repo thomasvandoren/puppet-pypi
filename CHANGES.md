@@ -1,6 +1,8 @@
 pypi module for puppet
 ======================
 
+0.0.5
+-----
 Parameterize the document root.
 Fix dependency in Modulefile.
 
