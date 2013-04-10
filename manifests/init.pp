@@ -81,7 +81,7 @@ class pypi (
     file      => "${pypi_root}/.htaccess",
     password  => $pypi_http_password,
     mechanism => 'basic',
-    require   => [ Package['httpd'], File['.htacess'] ],
+    require   => [ Package['httpd'], File['.htaccess'] ],
     notify    => Service['httpd'],
   }
 
