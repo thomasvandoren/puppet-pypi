@@ -67,13 +67,21 @@ class pypi (
     content => template('pypi/pypiserver_wsgi.py'),
     notify  => Service['httpd'],
   }
+  file { '.htaccess':
+    ensure => present,
+    path   => "${pypi_root}/.htaccess",
+    owner  => 'pypi',
+    group  => 'pypi',
+    mode   => '0644',
+    notify => Httpauth['pypiadmin'],
+  }
 
   httpauth { 'pypiadmin':
     ensure    => present,
     file      => "${pypi_root}/.htaccess",
     password  => $pypi_http_password,
     mechanism => 'basic',
-    require   => [ Package['httpd'], File[$pypi_root] ],
+    require   => [ Package['httpd'], File['.htacess'] ],
     notify    => Service['httpd'],
   }
 
