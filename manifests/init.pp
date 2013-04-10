@@ -67,14 +67,22 @@ class pypi (
     content => template('pypi/pypiserver_wsgi.py'),
     notify  => Service['httpd'],
   }
+  file { '.htaccess':
+    ensure => present,
+    path   => "${pypi_root}/.htaccess",
+    owner  => 'pypi',
+    group  => 'pypi',
+    mode   => '0644',
+    notify => Httpauth['pypiadmin'],
+  }
 
-  exec { 'create-htaccess':
-    command => "/usr/bin/htpasswd -sbc ${pypi_root}/.htaccess pypiadmin ${pypi_http_password}",
-    user    => 'pypi',
-    group   => 'pypi',
-    creates => "${pypi_root}/.htaccess",
-    require => Package['httpd'],
-    notify  => Service['httpd'],
+  httpauth { 'pypiadmin':
+    ensure    => present,
+    file      => "${pypi_root}/.htaccess",
+    password  => $pypi_http_password,
+    mechanism => 'basic',
+    require   => [ Package['httpd'], File['.htaccess'] ],
+    notify    => Service['httpd'],
   }
 
   include apache
