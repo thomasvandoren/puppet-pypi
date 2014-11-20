@@ -40,6 +40,7 @@
 #
 class pypi (
   $pypi_http_password = '1234',
+  $pypi_http_username = 'pypiadmin',
   $pypi_port = '80',
   $pypi_root = '/var/pypi',
   ) {
@@ -69,7 +70,7 @@ class pypi (
   }
 
   exec { 'create-htaccess':
-    command => "/usr/bin/htpasswd -sbc ${pypi_root}/.htaccess pypiadmin ${pypi_http_password}",
+    command => "/usr/bin/htpasswd -sbc ${pypi_root}/.htaccess ${pypi_http_username} ${pypi_http_password}",
     user    => 'pypi',
     group   => 'pypi',
     creates => "${pypi_root}/.htaccess",

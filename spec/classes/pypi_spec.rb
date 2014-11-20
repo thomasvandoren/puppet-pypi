@@ -65,6 +65,7 @@ describe 'pypi', :type => 'class' do
 
     let :params do
       {
+        :pypi_http_username => 'administrator',
         :pypi_http_password => 'TopSecret',
         :pypi_port          => '42',
         :pypi_root          => '/srv/somewhere'
@@ -75,7 +76,7 @@ describe 'pypi', :type => 'class' do
       should contain_exec('create-htaccess').with_command(/TopSecret$/)
       should contain_apache__vhost('pypi').with_port('42')
       should contain_file('pypiserver_wsgi.py').with_content(/pypiserver\.app\('\/srv\/somewhere\/packages.*\/srv\/somewhere\/\.htaccess/)
-      should contain_exec('create-htaccess').with_command(/\/usr\/bin\/htpasswd -sbc \/srv\/somewhere\/\.htaccess pypiadmin/)
+      should contain_exec('create-htaccess').with_command(/\/usr\/bin\/htpasswd -sbc \/srv\/somewhere\/\.htaccess administrator/)
       should contain_exec('create-htaccess').with_creates('/srv/somewhere/.htaccess')
       should contain_apache__vhost('pypi').with_docroot('/srv/somewhere')
     end # it
